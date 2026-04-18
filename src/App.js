@@ -7,6 +7,8 @@ function App() {
     factor: ""
   });
 
+  const [mensaje, setMensaje] = useState("");
+
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -14,41 +16,46 @@ function App() {
     });
   };
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-  // Validación
-  if (!form.anio || !form.monto || !form.factor) {
-    alert("Todos los campos son obligatorios");
-    return;
-  }
+    // Validación campos vacíos
+    if (!form.anio || !form.monto || !form.factor) {
+      setMensaje("Todos los campos son obligatorios");
+      return;
+    }
 
-  try {
-    const res = await fetch("http://localhost:3000/registros", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        anio: Number(form.anio),
-        monto: Number(form.monto),
-        factor: Number(form.factor)
-      })
+    // Validaciones numéricas
+    if (form.monto <= 0) {
+      setMensaje("El monto debe ser mayor a 0");
+      return;
+    }
+
+    if (form.factor <= 0) {
+      setMensaje("El factor debe ser mayor a 0");
+      return;
+    }
+
+    // 🔥 Simulación de backend (para avance)
+    const data = {
+      mensaje: "Registro guardado correctamente"
+    };
+
+    setMensaje(data.mensaje);
+
+    // Limpiar formulario
+    setForm({
+      anio: "",
+      monto: "",
+      factor: ""
     });
-
-    const data = await res.json();
-
-    alert("Respuesta del servidor: " + data.mensaje);
-
-  } catch (error) {
-    console.error(error);
-    alert("Error conectando con el backend");
-  }
-};
+  };
 
   return (
     <div style={{ padding: "20px" }}>
       <h1>Ingreso de Datos Tributarios</h1>
+
+      {mensaje && <p>{mensaje}</p>}
 
       <form onSubmit={handleSubmit}>
         <div>
@@ -58,7 +65,6 @@ function App() {
             name="anio"
             value={form.anio}
             onChange={handleChange}
-            required
           />
         </div>
 
@@ -69,7 +75,6 @@ function App() {
             name="monto"
             value={form.monto}
             onChange={handleChange}
-            required
           />
         </div>
 
@@ -81,7 +86,6 @@ function App() {
             name="factor"
             value={form.factor}
             onChange={handleChange}
-            required
           />
         </div>
 
